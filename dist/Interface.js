@@ -7,7 +7,7 @@ class Interface {
     constructor() {
         this.api = new Api_1.Api();
     }
-    createDb(username, password, host) {
+    createDb(username, password, host = '127.0.0.1') {
         return new Database_1.Database(host, username, password);
     }
 }
