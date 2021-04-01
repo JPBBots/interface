@@ -4,7 +4,8 @@
   "description": "JPBBots bot interface",
   "main": "dist/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "postinstall": "tsc"
   },
   "repository": {
     "type": "git",
@@ -18,9 +19,7 @@
   "homepage": "https://github.com/jpbbots/interface#readme",
   "dependencies": {
     "mongodb": "^3.6.5",
-    "node-fetch": "^2.6.1"
-  },
-  "devDependencies": {
+    "node-fetch": "^2.6.1",
     "@types/mongodb": "^3.6.11",
     "@types/node-fetch": "^2.5.8",
     "discord-api-types": "^0.13.3"
