@@ -1,0 +1,14 @@
+{
+  "include": ["./src/**/*"],
+  "compilerOptions": {
+    "target": "ES2017",
+    "moduleResolution": "node",
+    "strictNullChecks": true,
+    "declaration": true,
+    "strict": false,
+    "lib": ["ES6"],
+    "module": "commonjs",
+    "outDir": "dist",
+    "esModuleInterop": true
+  }
+}

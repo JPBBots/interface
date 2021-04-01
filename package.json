@@ -1,0 +1,28 @@
+{
+  "name": "interface",
+  "version": "1.0.0",
+  "description": "JPBBots bot interface",
+  "main": "dist/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jpbbots/interface.git"
+  },
+  "author": "JPBBerry",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jpbbots/interface/issues"
+  },
+  "homepage": "https://github.com/jpbbots/interface#readme",
+  "dependencies": {
+    "mongodb": "^3.6.5",
+    "node-fetch": "^2.6.1"
+  },
+  "devDependencies": {
+    "@types/mongodb": "^3.6.11",
+    "@types/node-fetch": "^2.5.8",
+    "discord-api-types": "^0.13.3"
+  }
+}
