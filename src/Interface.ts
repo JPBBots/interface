@@ -8,6 +8,8 @@ import permissionsMiddleware from '@discord-rose/permissions-middleware'
 import { CommandContext, Worker } from 'discord-rose'
 
 import EvalCommand from './extras/EvalCommand'
+import StatsCommand from './extras/StatsCommand'
+
 import { APIMessage } from 'discord-api-types'
 
 export class Interface {
@@ -25,8 +27,12 @@ export class Interface {
       }))
       .middleware(permissionsMiddleware())
 
-    // extra commands
+    this.addCommands(worker)
+  }
+
+  addCommands (worker: Worker) {
     worker.commands
+      .add(StatsCommand)
       .add(EvalCommand)
   }
 
