@@ -5,10 +5,12 @@ import flagsMiddleware from '@discord-rose/flags-middleware'
 import adminMiddleware from '@discord-rose/admin-middleware'
 import permissionsMiddleware from '@discord-rose/permissions-middleware'
 
-import { CommandContext, Worker } from 'discord-rose'
+import { CommandContext, Master, Worker } from 'discord-rose'
 
 import EvalCommand from './extras/EvalCommand'
 import StatsCommand from './extras/StatsCommand'
+
+import { setupInflux } from './Influx'
 
 import { APIMessage } from 'discord-api-types'
 
@@ -17,6 +19,10 @@ export class Interface {
 
   createDb (username: string, password: string, host: string = '127.0.0.1') {
     return new Database(host, username, password)
+  }
+
+  setupMaster (master: Master, name: string) {
+    setupInflux(master, name)
   }
 
   setupWorker (worker: Worker) {
