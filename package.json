@@ -27,5 +27,8 @@
     "influx": "^5.8.0",
     "mongodb": "^3.6.5",
     "node-fetch": "^2.6.1"
+  },
+  "devDependencies": {
+    "@types/node": "^15.12.2"
   }
 }

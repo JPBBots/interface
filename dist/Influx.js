@@ -22,7 +22,6 @@ function setupInflux(master, name) {
     });
     const run = async () => {
         const stats = await master.getStats();
-        console.log('Posted stats to runner');
         void influx.writePoints([
             {
                 measurement: 'stats',

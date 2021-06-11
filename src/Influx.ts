@@ -23,7 +23,6 @@ export function setupInflux(master: Master, name: string) {
 
   const run = async () => {
     const stats = await master.getStats()
-    console.log('Posted stats to runner')
 
     void influx.writePoints([
       {
