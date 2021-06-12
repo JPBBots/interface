@@ -29,17 +29,23 @@ class Interface {
             };
         }
         if (wh) {
-            master.log = (msg, cluster) => {
-                // @ts-expect-error
-                const message = `${cluster ? `Cluster ${cluster.id}${' '.repeat(master.longestName - cluster.id.length)}` : `Master ${' '.repeat(master.longestName + 1)}`} | ${msg}`;
-                console.log(message);
+            const log = (msg) => {
                 if (!wh)
                     return;
                 master.rest.webhooks.send(wh.id, wh.token, {
-                    content: message,
+                    content: msg,
                     username: name
                 });
             };
+            master.on('CLUSTER_STARTED', (cluster) => {
+                log(`Cluster ${cluster.id} started`);
+            });
+            master.on('CLUSTER_STOPPED', (cluster) => {
+                log(`Cluster ${cluster.id} stopped`);
+            });
+            master.handlers.on('SHARD_READY', (cluster, { id }) => {
+                log(`Shard ${id} on cluster ${cluster.id} ready`);
+            });
         }
     }
     setupWorker(worker) {
