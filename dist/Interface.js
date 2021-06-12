@@ -72,7 +72,7 @@ class Interface {
                         new discord_rose_1.Embed()
                             .color(colors[status])
                             .title(`${status} Server`)
-                            .description(`${guild.id}${guild.name ? `, ${guild.name}: ${guild.member_count}` : ''}`)
+                            .description(`${guild.id}${guild.name ? `, ${guild.name}\n${guild.member_count} members` : ''}`)
                             .render()
                     ]
                 });
