@@ -5,7 +5,7 @@ import flagsMiddleware from '@discord-rose/flags-middleware'
 import adminMiddleware from '@discord-rose/admin-middleware'
 import permissionsMiddleware from '@discord-rose/permissions-middleware'
 
-import { CommandContext, Master, Worker } from 'discord-rose'
+import { CommandContext, Embed, Master, Worker } from 'discord-rose'
 
 import EvalCommand from './extras/EvalCommand'
 import StatsCommand from './extras/StatsCommand'
@@ -13,6 +13,7 @@ import StatsCommand from './extras/StatsCommand'
 import { setupInflux } from './Influx'
 
 import { APIMessage, Snowflake } from 'discord-api-types'
+import { CachedGuild } from 'discord-rose/dist/typings/Discord'
 
 export class Interface {
   api = new Api()
@@ -63,6 +64,50 @@ export class Interface {
       .middleware(permissionsMiddleware())
 
     this.addCommands(worker)
+
+    if (process.env.GUILDS_WEBHOOK_ID) {
+      const colors = {
+        Joined: 0x109c10,
+        Left: 0xc41f1f,
+        Unavailable: 0xc4771a,
+        Available: 0xe3d512
+      }
+      const log = (status: 'Joined' | 'Left' | 'Unavailable' | 'Available', guild: CachedGuild) => {
+        worker.api.webhooks.send(process.env.GUILDS_WEBHOOK_ID as Snowflake, process.env.GUILDS_WEBHOOK_TOKEN as string, {
+          username: worker.user?.username,
+          embeds: [
+            new Embed()
+              .color(colors[status])
+              .title(`${status} Server`)
+              .description(`${guild.id}${guild.name ? `, ${guild.name}: ${guild.member_count}` : ''}`)
+              .render()
+          ]
+        })
+      }
+
+      const unavailable = new Set()
+
+      worker.on('GUILD_DELETE', (guild) => {
+        if (guild.unavailable) return
+
+        log('Left', guild as CachedGuild)
+
+        if (unavailable.has(guild.id)) unavailable.delete(guild.id)
+      })
+      worker.on('GUILD_UNAVAILABLE', (guild) => {
+        unavailable.add(guild.id)
+        log('Unavailable', guild)
+      })
+      worker.on('GUILD_CREATE', (guild) => {
+        if (unavailable.has(guild.id)) {
+          unavailable.delete(guild.id)
+
+          return log('Available', guild)
+        }
+
+        log('Joined', guild)
+      })
+    }
   }
 
   addCommands (worker: Worker) {
