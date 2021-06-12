@@ -12,7 +12,7 @@ import StatsCommand from './extras/StatsCommand'
 
 import { setupInflux } from './Influx'
 
-import { APIMessage } from 'discord-api-types'
+import { APIMessage, Snowflake } from 'discord-api-types'
 
 export class Interface {
   api = new Api()
@@ -23,6 +23,30 @@ export class Interface {
 
   setupMaster (master: Master, name: string) {
     setupInflux(master, name)
+
+    let wh: { id: Snowflake, token: string } | null = null
+
+    if (process.env.STATUS_WEBHOOK_ID) {
+      wh = {
+        id: process.env.STATUS_WEBHOOK_ID as Snowflake,
+        token: process.env.STATUS_WEBHOOK_TOKEN as string
+      }
+    }
+
+    if (wh) {
+      master.log = (msg, cluster) => {
+        // @ts-expect-error
+        const message = `${cluster ? `Cluster ${cluster.id}${' '.repeat(master.longestName - cluster.id.length)}` : `Master ${' '.repeat(master.longestName + 1)}`} | ${msg}`
+        console.log(message)
+
+        if (!wh) return
+
+        master.rest.webhooks.send(wh.id, wh.token, {
+          content: message,
+          username: name
+        })
+      }
+    }
   }
 
   setupWorker (worker: Worker) {

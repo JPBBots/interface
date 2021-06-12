@@ -21,6 +21,26 @@ class Interface {
     }
     setupMaster(master, name) {
         Influx_1.setupInflux(master, name);
+        let wh = null;
+        if (process.env.STATUS_WEBHOOK_ID) {
+            wh = {
+                id: process.env.STATUS_WEBHOOK_ID,
+                token: process.env.STATUS_WEBHOOK_TOKEN
+            };
+        }
+        if (wh) {
+            master.log = (msg, cluster) => {
+                // @ts-expect-error
+                const message = `${cluster ? `Cluster ${cluster.id}${' '.repeat(master.longestName - cluster.id.length)}` : `Master ${' '.repeat(master.longestName + 1)}`} | ${msg}`;
+                console.log(message);
+                if (!wh)
+                    return;
+                master.rest.webhooks.send(wh.id, wh.token, {
+                    content: message,
+                    username: name
+                });
+            };
+        }
     }
     setupWorker(worker) {
         worker.commands
