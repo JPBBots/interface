@@ -13,7 +13,7 @@ class Api {
         return node_fetch_1.default(`${this.url}${url}`, {
             method,
             headers: Object.assign({ 'Content-Type': 'application/json' }, (headers !== null && headers !== void 0 ? headers : {})),
-            body
+            body: body ? JSON.stringify(body) : undefined
         }).then(x => x.text());
     }
     async isAdmin(id) {
