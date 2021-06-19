@@ -5,9 +5,14 @@ import { Snowflake } from 'discord-api-types'
 export class Api {
   url = 'https://jpbbots.org/api'
 
-  public _request (method: 'GET' | 'POST', url: string, body?: any) {
+  public _request (method: 'GET' | 'POST', url: string, headers?: any, body?: any) {
     return fetch(`${this.url}${url}`, {
-      method
+      method,
+      headers: {
+        'Content-Type': 'application/json',
+        ...(headers ?? {})
+      },
+      body
     }).then(x => x.text())
   }
 

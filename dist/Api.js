@@ -9,9 +9,11 @@ class Api {
     constructor() {
         this.url = 'https://jpbbots.org/api';
     }
-    _request(method, url, body) {
+    _request(method, url, headers, body) {
         return node_fetch_1.default(`${this.url}${url}`, {
-            method
+            method,
+            headers: Object.assign({ 'Content-Type': 'application/json' }, (headers !== null && headers !== void 0 ? headers : {})),
+            body
         }).then(x => x.text());
     }
     async isAdmin(id) {
