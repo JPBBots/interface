@@ -12,7 +12,7 @@ export class Api {
         'Content-Type': 'application/json',
         ...(headers ?? {})
       },
-      body
+      body: body ? JSON.stringify(body) : undefined
     }).then(x => x.text())
   }
 
