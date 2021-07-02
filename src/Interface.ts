@@ -54,6 +54,19 @@ export class Interface {
       master.handlers.on('SHARD_READY', (cluster, { id }) => {
         log(`Shard ${id} on cluster ${cluster.id} ready`)
       })
+
+      if (process.env.ERROR_WEBHOOK_ID) {
+        master.once('READY', () => {
+          master.rest.on('error', (err) => {
+            const embed = new Embed()
+            embed
+              .field('Bot', `${name} (master)`)
+              .description(`\`\`\`${util.inspect(err)}\`\`\``)
+    
+            master.rest.webhooks.send(process.env.ERROR_WEBHOOK_ID as Snowflake, process.env.ERROR_WEBHOOK_TOKEN as string, embed)
+          })
+        })
+      }
     }
   }
 
@@ -115,7 +128,9 @@ export class Interface {
       worker.once('READY', () => {
         worker.api.on('error', (err) => {
           const embed = new Embed()
-          embed.description(`\`\`\`${util.inspect(err)}\`\`\``)
+          embed
+            .field('Bot', `${worker.user?.username} (worker)`)
+            .description(`\`\`\`${util.inspect(err)}\`\`\``)
 
           worker.comms.sendWebhook(process.env.ERROR_WEBHOOK_ID as Snowflake, process.env.ERROR_WEBHOOK_TOKEN as string, embed)
         })

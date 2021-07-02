@@ -48,6 +48,17 @@ class Interface {
             master.handlers.on('SHARD_READY', (cluster, { id }) => {
                 log(`Shard ${id} on cluster ${cluster.id} ready`);
             });
+            if (process.env.ERROR_WEBHOOK_ID) {
+                master.once('READY', () => {
+                    master.rest.on('error', (err) => {
+                        const embed = new discord_rose_1.Embed();
+                        embed
+                            .field('Bot', `${name} (master)`)
+                            .description(`\`\`\`${util_1.default.inspect(err)}\`\`\``);
+                        master.rest.webhooks.send(process.env.ERROR_WEBHOOK_ID, process.env.ERROR_WEBHOOK_TOKEN, embed);
+                    });
+                });
+            }
         }
     }
     setupWorker(worker) {
@@ -101,8 +112,11 @@ class Interface {
         if (process.env.ERROR_WEBHOOK_ID) {
             worker.once('READY', () => {
                 worker.api.on('error', (err) => {
+                    var _a;
                     const embed = new discord_rose_1.Embed();
-                    embed.description(`\`\`\`${util_1.default.inspect(err)}\`\`\``);
+                    embed
+                        .field('Bot', `${(_a = worker.user) === null || _a === void 0 ? void 0 : _a.username} (worker)`)
+                        .description(`\`\`\`${util_1.default.inspect(err)}\`\`\``);
                     worker.comms.sendWebhook(process.env.ERROR_WEBHOOK_ID, process.env.ERROR_WEBHOOK_TOKEN, embed);
                 });
             });
