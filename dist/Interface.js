@@ -4,6 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Interface = void 0;
+const util_1 = __importDefault(require("util"));
 const Api_1 = require("./Api");
 const Database_1 = require("./Database");
 const flags_middleware_1 = __importDefault(require("@discord-rose/flags-middleware"));
@@ -95,6 +96,15 @@ class Interface {
                     return log('Available', guild);
                 }
                 log('Joined', guild);
+            });
+        }
+        if (process.env.ERROR_WEBHOOK_ID) {
+            worker.once('READY', () => {
+                worker.api.on('error', (err) => {
+                    const embed = new discord_rose_1.Embed();
+                    embed.description(`\`\`\`${util_1.default.inspect(err)}\`\`\``);
+                    worker.comms.sendWebhook(process.env.ERROR_WEBHOOK_ID, process.env.ERROR_WEBHOOK_TOKEN, embed);
+                });
             });
         }
     }

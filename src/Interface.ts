@@ -1,3 +1,5 @@
+import util from 'util'
+
 import { Api } from './Api'
 import { Database } from './Database'
 
@@ -96,7 +98,7 @@ export class Interface {
       })
       worker.on('GUILD_UNAVAILABLE', (guild) => {
         unavailable.add(guild.id)
-        log('Unavailable', guild)
+        log('Unavailable', guild as CachedGuild)
       })
       worker.on('GUILD_CREATE', (guild) => {
         if (unavailable.has(guild.id)) {
@@ -106,6 +108,17 @@ export class Interface {
         }
 
         log('Joined', guild)
+      })
+    }
+
+    if (process.env.ERROR_WEBHOOK_ID) {
+      worker.once('READY', () => {
+        worker.api.on('error', (err) => {
+          const embed = new Embed()
+          embed.description(`\`\`\`${util.inspect(err)}\`\`\``)
+
+          worker.comms.sendWebhook(process.env.ERROR_WEBHOOK_ID as Snowflake, process.env.ERROR_WEBHOOK_TOKEN as string, embed)
+        })
       })
     }
   }
