@@ -49,12 +49,11 @@ class Interface {
                 log(`Shard ${id} on cluster ${cluster.id} ready`);
             });
             if (process.env.ERROR_WEBHOOK_ID) {
-                master.once('READY', () => {
+                master.once('CLUSTER_STARTED', () => {
                     master.rest.on('error', (err) => {
-                        const embed = new discord_rose_1.Embed();
-                        embed
+                        const embed = new discord_rose_1.Embed()
                             .field('Bot', `${name} (master)`)
-                            .description(`\`\`\`${util_1.default.inspect(err)}\`\`\``);
+                            .description(`\`\`\`xl\n${util_1.default.inspect(err)}\`\`\``);
                         master.rest.webhooks.send(process.env.ERROR_WEBHOOK_ID, process.env.ERROR_WEBHOOK_TOKEN, embed);
                     });
                 });
@@ -110,13 +109,12 @@ class Interface {
             });
         }
         if (process.env.ERROR_WEBHOOK_ID) {
-            worker.once('READY', () => {
+            worker.once('SHARD_READY', () => {
                 worker.api.on('error', (err) => {
                     var _a;
-                    const embed = new discord_rose_1.Embed();
-                    embed
+                    const embed = new discord_rose_1.Embed()
                         .field('Bot', `${(_a = worker.user) === null || _a === void 0 ? void 0 : _a.username} (worker)`)
-                        .description(`\`\`\`${util_1.default.inspect(err)}\`\`\``);
+                        .description(`\`\`\`xl\n${util_1.default.inspect(err)}\`\`\``);
                     worker.comms.sendWebhook(process.env.ERROR_WEBHOOK_ID, process.env.ERROR_WEBHOOK_TOKEN, embed);
                 });
             });

@@ -56,12 +56,11 @@ export class Interface {
       })
 
       if (process.env.ERROR_WEBHOOK_ID) {
-        master.once('READY', () => {
+        master.once('CLUSTER_STARTED', () => {
           master.rest.on('error', (err) => {
             const embed = new Embed()
-            embed
               .field('Bot', `${name} (master)`)
-              .description(`\`\`\`${util.inspect(err)}\`\`\``)
+              .description(`\`\`\`xl\n${util.inspect(err)}\`\`\``)
     
             master.rest.webhooks.send(process.env.ERROR_WEBHOOK_ID as Snowflake, process.env.ERROR_WEBHOOK_TOKEN as string, embed)
           })
@@ -125,12 +124,11 @@ export class Interface {
     }
 
     if (process.env.ERROR_WEBHOOK_ID) {
-      worker.once('READY', () => {
+      worker.once('SHARD_READY', () => {
         worker.api.on('error', (err) => {
           const embed = new Embed()
-          embed
             .field('Bot', `${worker.user?.username} (worker)`)
-            .description(`\`\`\`${util.inspect(err)}\`\`\``)
+            .description(`\`\`\`xl\n${util.inspect(err)}\`\`\``)
 
           worker.comms.sendWebhook(process.env.ERROR_WEBHOOK_ID as Snowflake, process.env.ERROR_WEBHOOK_TOKEN as string, embed)
         })
