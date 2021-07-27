@@ -1,0 +1,37 @@
+name: Build
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Fetch Tags
+        run: git fetch --prune --tags
+
+      - name: Configure CI Git User
+        run: |
+          git config --global user.name '@jpbbot'
+          git config --global user.email 'jpbbot@users.noreply.github.com'
+      - name: Setup Node
+        uses: actions/setup-node@v1
+        with:
+          node-version: "14.x"
+          registry-url: "https://npm.pkg.github.com/"
+          scope: "@jpbbots"
+
+      - name: Install Dependencies
+        run: npm i --also=dev
+
+      - name: Build Components
+        run: npm run build
+
+      - name: Publish Library
+        run: NODE_AUTH_TOKEN=${{secrets.GITHUB_TOKEN}} npx lerna publish --yes
