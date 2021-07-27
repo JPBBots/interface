@@ -1,4 +1,7 @@
 src/
+tsconfig.json
+CHANGELOG.md
+.github
 
 # Logs
 logs
