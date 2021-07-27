@@ -30,8 +30,8 @@ jobs:
       - name: Install Dependencies
         run: npm i --also=dev
 
-      - name: Build Components
+      - name: Build Library
         run: npm run build
 
       - name: Publish Library
-        run: NODE_AUTH_TOKEN=${{secrets.GITHUB_TOKEN}} npx lerna publish --yes
+        run: NODE_AUTH_TOKEN=${{secrets.GITHUB_TOKEN}} npx lerna publish --yes --no-changelog
