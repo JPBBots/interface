@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.setupInflux = void 0;
 const influx_1 = require("influx");
-function setupInflux(master, name) {
+function setupInflux(thread, name) {
     const influx = new influx_1.InfluxDB({
         host: 'localhost',
         database: 'stats',
@@ -21,7 +21,7 @@ function setupInflux(master, name) {
         ]
     });
     const run = async () => {
-        const stats = await master.getStats();
+        const stats = await thread.getStats();
         void influx.writePoints([
             {
                 measurement: 'stats',
@@ -35,7 +35,7 @@ function setupInflux(master, name) {
             }
         ]);
     };
-    master.on('READY', () => {
+    return (() => {
         run();
         setInterval(() => {
             run();

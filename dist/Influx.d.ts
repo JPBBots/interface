@@ -1,2 +1,2 @@
-import { Master } from 'discord-rose';
-export declare function setupInflux(master: Master, name: string): void;
+import { Thread } from 'discord-rose';
+export declare function setupInflux(thread: Pick<Thread, 'getStats'>, name: string): () => void;

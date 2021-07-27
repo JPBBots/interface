@@ -21,8 +21,38 @@ class Interface {
     createDb(username, password, host = '127.0.0.1') {
         return new Database_1.Database(host, username, password);
     }
+    setupSingleton(worker, name) {
+        this.setupWorker(worker);
+        let wh = null;
+        if (process.env.STATUS_WEBHOOK_ID) {
+            wh = {
+                id: process.env.STATUS_WEBHOOK_ID,
+                token: process.env.STATUS_WEBHOOK_TOKEN
+            };
+        }
+        if (wh) {
+            const log = (msg) => {
+                if (!wh)
+                    return;
+                worker.api.webhooks.send(wh.id, wh.token, {
+                    content: msg,
+                    username: name
+                });
+            };
+            worker.on('SHARD_READY', ({ id }) => {
+                log(`Shard ${id} ready`);
+            });
+        }
+        const run = Influx_1.setupInflux(worker.comms, name);
+        worker.once('READY', () => {
+            run();
+        });
+    }
     setupMaster(master, name) {
-        Influx_1.setupInflux(master, name);
+        const run = Influx_1.setupInflux(master, name);
+        master.on('READY', () => {
+            run();
+        });
         let wh = null;
         if (process.env.STATUS_WEBHOOK_ID) {
             wh = {

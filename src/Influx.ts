@@ -1,8 +1,8 @@
-import { Master, Worker } from 'discord-rose'
+import { Thread } from 'discord-rose'
 
 import { FieldType, InfluxDB } from 'influx'
 
-export function setupInflux(master: Master, name: string) {
+export function setupInflux (thread: Pick<Thread, 'getStats'>, name: string) {
   const influx = new InfluxDB({
     host: 'localhost',
     database: 'stats',
@@ -22,7 +22,7 @@ export function setupInflux(master: Master, name: string) {
   })
 
   const run = async () => {
-    const stats = await master.getStats()
+    const stats = await thread.getStats()
 
     void influx.writePoints([
       {
@@ -38,7 +38,7 @@ export function setupInflux(master: Master, name: string) {
     ])
   }
 
-  master.on('READY', () => {
+  return (() => {
     run()
 
     setInterval(() => {

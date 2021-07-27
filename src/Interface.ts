@@ -7,7 +7,7 @@ import flagsMiddleware from '@discord-rose/flags-middleware'
 import adminMiddleware from '@discord-rose/admin-middleware'
 import permissionsMiddleware from '@discord-rose/permissions-middleware'
 
-import { CommandContext, Embed, Master, Worker } from 'discord-rose'
+import { CommandContext, Embed, Master, Worker, SingleWorker } from 'discord-rose'
 
 import EvalCommand from './extras/EvalCommand'
 import StatsCommand from './extras/StatsCommand'
@@ -24,8 +24,44 @@ export class Interface {
     return new Database(host, username, password)
   }
 
+  setupSingleton (worker: SingleWorker, name: string) {
+    this.setupWorker(worker)
+
+    let wh: { id: Snowflake, token: string } | null = null
+
+    if (process.env.STATUS_WEBHOOK_ID) {
+      wh = {
+        id: process.env.STATUS_WEBHOOK_ID as Snowflake,
+        token: process.env.STATUS_WEBHOOK_TOKEN as string
+      }
+    }
+
+    if (wh) {
+      const log = (msg: string): void => {
+        if (!wh) return
+        worker.api.webhooks.send(wh.id, wh.token, {
+          content: msg,
+          username: name
+        })
+      }
+
+      worker.on('SHARD_READY', ({ id }) => {
+        log(`Shard ${id} ready`)
+      })
+    }
+
+    const run = setupInflux(worker.comms, name)
+
+    worker.once('READY', () => {
+      run()
+    })
+  }
+
   setupMaster (master: Master, name: string) {
-    setupInflux(master, name)
+    const run = setupInflux(master, name)
+    master.on('READY', () => {
+      run()
+    })
 
     let wh: { id: Snowflake, token: string } | null = null
 
