@@ -190,13 +190,11 @@ export class Interface {
       }
 
       const clear = () => {
-        // @ts-expect-error discord-api-types suck
         ctx.worker.off('MESSAGE_CREATE', listener)
 
         if (timeout) clearTimeout(timeout)
       }
 
-      // @ts-expect-error
       ctx.worker.on('MESSAGE_CREATE', listener)
 
       if (opts.time) timeout = setTimeout(() => {
