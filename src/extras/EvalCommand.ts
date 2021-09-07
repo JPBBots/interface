@@ -1,4 +1,5 @@
-import { CommandOptions } from 'discord-rose'
+import { APIMessage } from 'discord-api-types'
+import { CommandOptions, Embed } from 'discord-rose'
 
 import util from 'util'
 
@@ -19,6 +20,8 @@ export default {
 
     const worker = ctx.worker
 
+    const emb = new Embed()
+
     try {
       const code = ctx.message.content.slice(Number(ctx.prefix.length) + Number(ctx.ran.length))
 
@@ -35,19 +38,29 @@ export default {
 
       if (typeof evaled !== 'string') { evaled = util.inspect(evaled) }
 
-      if (ctx.flags.s) return
-
-      void ctx.embed
+      emb
         .color(0x28bf62)
         .title('Eval Successful')
-        .description(`\`\`\`xl\n${evaled}\`\`\``)
-        .send()
+        .description(`\`\`\`xl\n${evaled}\`\`\``) 
     } catch (err) {
-      void ctx.embed
+      emb
         .color(0xdb0b0b)
         .title('Eval Unsuccessful')
         .description(`\`\`\`xl\n${clean(err)}\`\`\``)
-        .send()
     }
+
+    if (ctx.flags.d) return ctx.delete()
+    if (ctx.flags.dm) return ctx.dm(emb)
+    if (ctx.flags.s) return
+
+    await ctx.send({
+      embeds: [emb.render()],
+      message_reference: {
+        message_id: ctx.message.id,
+        channel_id: ctx.channel?.id,
+        guild_id: ctx.guild?.id,
+        fail_if_not_exists: false
+      }
+    })
   }
 } as CommandOptions
