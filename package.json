@@ -1,6 +1,6 @@
 {
   "name": "@jpbbots/interface",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "JPBBots bot interface",
   "main": "dist/index.js",
   "scripts": {
