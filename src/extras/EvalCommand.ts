@@ -49,8 +49,10 @@ export default {
         .description(`\`\`\`xl\n${clean(err)}\`\`\``)
     }
 
-    if (ctx.flags.d) return ctx.delete()
-    if (ctx.flags.dm) return ctx.dm(emb)
+    if (ctx.flags.d) ctx.delete()
+    if (ctx.flags.dm) return ctx.dm({
+      embeds: [emb.render()]
+    })
     if (ctx.flags.s) return
 
     await ctx.send({
@@ -60,6 +62,9 @@ export default {
         channel_id: ctx.channel?.id,
         guild_id: ctx.guild?.id,
         fail_if_not_exists: false
+      },
+      allowed_mentions: {
+        replied_user: false
       }
     })
   }
