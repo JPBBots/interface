@@ -6,7 +6,7 @@
     "strictNullChecks": true,
     "declaration": true,
     "strict": false,
-    "lib": ["ES6"],
+    "lib": ["ES6", "DOM"],
     "module": "commonjs",
     "outDir": "dist",
     "esModuleInterop": true

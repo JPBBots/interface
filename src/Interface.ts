@@ -3,14 +3,13 @@ import util from 'util'
 import { Api } from './Api'
 import { Database } from './Database'
 
-import { Master, Worker, SingleWorker } from 'jadl'
+import { Master, Worker, SingleWorker, CachedGuild } from 'jadl'
 
 import { Embed } from '@jadl/embed'
 
 import { setupInflux } from './Influx'
 
 import { APIGuild, Routes, Snowflake } from 'discord-api-types/v9'
-import { CachedGuild } from 'discord-rose/dist/typings/Discord'
 
 export class Interface {
   api = new Api()
