@@ -1,6 +1,7 @@
 import { MongoClient, Db, Collection } from 'mongodb'
+import { EventEmitter } from '@jpbberry/typed-emitter'
 
-export class Database {
+export class Database extends EventEmitter<{ started: void }>{
   mongo: MongoClient
   db?: Db
 
@@ -13,6 +14,8 @@ export class Database {
   }[] = []
 
   constructor (host: string, public username: string, password: string) {
+    super()
+
     this.mongo = new MongoClient(`mongodb://${username}:${password}@${host}:27017/`, {
       useNewUrlParser: true,
       useUnifiedTopology: true
@@ -32,6 +35,8 @@ export class Database {
         x.promise(res)
       })
     })
+
+    this.emit('started')
   }
 
   get collection (): (name: string) => Collection {

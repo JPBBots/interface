@@ -3,28 +3,23 @@ import util from 'util'
 import { Api } from './Api'
 import { Database } from './Database'
 
-import flagsMiddleware from '@discord-rose/flags-middleware'
-import adminMiddleware from '@discord-rose/admin-middleware'
-import permissionsMiddleware from '@discord-rose/permissions-middleware'
+import { Master, Worker, SingleWorker } from 'jadl'
 
-import { CommandContext, Embed, Master, Worker, SingleWorker } from 'discord-rose'
-
-import EvalCommand from './extras/EvalCommand'
-import StatsCommand from './extras/StatsCommand'
+import { Embed } from '@jadl/embed'
 
 import { setupInflux } from './Influx'
 
-import { APIMessage, Snowflake } from 'discord-api-types'
+import { APIGuild, Routes, Snowflake } from 'discord-api-types/v9'
 import { CachedGuild } from 'discord-rose/dist/typings/Discord'
 
 export class Interface {
   api = new Api()
 
-  createDb (username: string, password: string, host: string = '127.0.0.1') {
+  createDb(username: string, password: string, host: string = '127.0.0.1') {
     return new Database(host, username, password)
   }
 
-  setupSingleton (worker: SingleWorker, name: string) {
+  setupSingleton(worker: SingleWorker, name: string) {
     this.setupWorker(worker)
 
     let wh: { id: Snowflake, token: string } | null = null
@@ -39,9 +34,11 @@ export class Interface {
     if (wh) {
       const log = (msg: string): void => {
         if (!wh) return
-        worker.api.webhooks.send(wh.id, wh.token, {
-          content: msg,
-          username: name
+        worker.api.post(Routes.webhook(wh.id, wh.token), {
+          body: {
+            content: msg,
+            username: name
+          }
         })
       }
 
@@ -57,7 +54,7 @@ export class Interface {
     })
   }
 
-  setupMaster (master: Master, name: string) {
+  setupMaster(master: Master, name: string) {
     const run = setupInflux(master, name)
     master.on('READY', () => {
       run()
@@ -75,12 +72,14 @@ export class Interface {
     if (wh) {
       const log = (msg: string): void => {
         if (!wh) return
-        master.rest.webhooks.send(wh.id, wh.token, {
-          content: msg,
-          username: name
+        master.rest.post(Routes.webhook(wh.id, wh.token), {
+          body: {
+            content: msg,
+            username: name
+          }
         })
       }
-      
+
       master.on('CLUSTER_STARTED', (cluster) => {
         log(`Cluster ${cluster.id} started`)
       })
@@ -97,24 +96,19 @@ export class Interface {
             const embed = new Embed()
               .field('Bot', `${name} (master)`)
               .description(`\`\`\`xl\n${util.inspect(err)}\`\`\``)
-    
-            master.rest.webhooks.send(process.env.ERROR_WEBHOOK_ID as Snowflake, process.env.ERROR_WEBHOOK_TOKEN as string, embed)
+
+            master.rest.post(Routes.webhook(process.env.ERROR_WEBHOOK_ID as Snowflake, process.env.ERROR_WEBHOOK_TOKEN), {
+              body: {
+                embeds: [embed.render()]
+              }
+            })
           })
         })
       }
     }
   }
 
-  setupWorker (worker: Worker) {
-    worker.commands
-      .middleware(flagsMiddleware())
-      .middleware(adminMiddleware((id) => {
-        return this.api.isAdmin(id)
-      }))
-      .middleware(permissionsMiddleware())
-
-    this.addCommands(worker)
-
+  setupWorker(worker: Worker) {
     if (process.env.GUILDS_WEBHOOK_ID) {
       const colors = {
         Joined: 0x109c10,
@@ -122,16 +116,18 @@ export class Interface {
         Unavailable: 0xc4771a,
         Available: 0xe3d512
       }
-      const log = (status: 'Joined' | 'Left' | 'Unavailable' | 'Available', guild: CachedGuild) => {
-        worker.api.webhooks.send(process.env.GUILDS_WEBHOOK_ID as Snowflake, process.env.GUILDS_WEBHOOK_TOKEN as string, {
-          username: worker.user?.username,
-          embeds: [
-            new Embed()
-              .color(colors[status])
-              .title(`${status} Server`)
-              .description(`${guild.id}${guild.name ? `, ${guild.name}\n${guild.member_count} members` : ''}`)
-              .render()
-          ]
+      const log = (status: 'Joined' | 'Left' | 'Unavailable' | 'Available', guild: CachedGuild | APIGuild) => {
+        worker.api.post(Routes.webhook(process.env.GUILDS_WEBHOOK_ID as Snowflake, process.env.GUILDS_WEBHOOK_TOKEN as string), {
+          body: {
+            username: worker.user?.username,
+            embeds: [
+              new Embed()
+                .color(colors[status])
+                .title(`${status} Server`)
+                .description(`${guild.id}${guild.name ? `, ${guild.name}\n${guild.member_count} members` : ''}`)
+                .render()
+            ]
+          }
         })
       }
 
@@ -166,41 +162,15 @@ export class Interface {
             .field('Bot', `${worker.user?.username} (worker)`)
             .description(`\`\`\`xl\n${util.inspect(err)}\`\`\``)
 
-          worker.comms.sendWebhook(process.env.ERROR_WEBHOOK_ID as Snowflake, process.env.ERROR_WEBHOOK_TOKEN as string, embed)
+
+
+          worker.api.post(Routes.webhook(process.env.ERROR_WEBHOOK_ID as Snowflake, process.env.ERROR_WEBHOOK_TOKEN as string), {
+            body: {
+              embeds: [embed.render()]
+            }
+          })
         })
       })
     }
-  }
-
-  addCommands (worker: Worker) {
-    worker.commands
-      .add(StatsCommand)
-      .add(EvalCommand)
-  }
-
-  collectMessage (ctx: CommandContext, filter: (message: APIMessage) => boolean, opts: { time: number }): Promise<APIMessage> {
-    return new Promise((resolve, reject) => {
-      let timeout: NodeJS.Timeout
-      const listener = (message: APIMessage) => {
-        if (filter(message)) {
-          clear()
-
-          resolve(message)
-        }
-      }
-
-      const clear = () => {
-        ctx.worker.off('MESSAGE_CREATE', listener)
-
-        if (timeout) clearTimeout(timeout)
-      }
-
-      ctx.worker.on('MESSAGE_CREATE', listener)
-
-      if (opts.time) timeout = setTimeout(() => {
-        clear()
-        reject('Didn\'t respond in time.')
-      }, opts.time)
-    })
   }
 }

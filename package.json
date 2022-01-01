@@ -1,6 +1,6 @@
 {
   "name": "@jpbbots/interface",
-  "version": "1.0.5",
+  "version": "2.0.0",
   "description": "JPBBots bot interface",
   "main": "dist/index.js",
   "scripts": {
@@ -21,14 +21,14 @@
   },
   "homepage": "https://github.com/jpbbots/interface#readme",
   "dependencies": {
-    "@discord-rose/admin-middleware": "^1.1.0",
-    "@discord-rose/flags-middleware": "^1.0.2",
-    "@discord-rose/permissions-middleware": "^1.2.0",
+    "@jadl/cmd": "^0.1.5",
+    "@jadl/embed": "^0.0.3",
+    "@jpbberry/typed-emitter": "^1.2.1",
     "@types/mongodb": "^3.6.20",
     "@types/node-fetch": "^2.5.12",
-    "discord-api-types": "^0.22.0",
-    "discord-rose": "^1.5.3",
+    "discord-api-types": "^0.26.0",
     "influx": "^5.9.2",
+    "jadl": "^0.1.5",
     "mongodb": "^3.7.0",
     "node-fetch": "^2.6.2"
   },

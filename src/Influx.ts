@@ -1,4 +1,4 @@
-import { Thread } from 'discord-rose'
+import { Thread } from 'jadl'
 
 import { FieldType, InfluxDB } from 'influx'
 
