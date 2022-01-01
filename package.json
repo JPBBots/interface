@@ -5,7 +5,8 @@
   "main": "dist/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tsc"
+    "build": "tsc",
+    "version": "lerna publish"
   },
   "repository": {
     "type": "git",
@@ -34,6 +35,6 @@
   },
   "devDependencies": {
     "@types/node": "^15.14.9",
-    "lerna": "^2.11.0"
+    "lerna": "^4.0.0"
   }
 }
