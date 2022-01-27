@@ -91,17 +91,17 @@ export class Interface {
         log(`Shard ${id} on cluster ${cluster.id} ready`)
       })
 
-      if (process.env.ERROR_WEBHOOK_ID) {
-        master.once('CLUSTER_STARTED', () => {
-          master.rest.on('error', (err) => {
-            const embed = new Embed()
-              .field('Bot', `${name} (master)`)
-              .description(`\`\`\`xl\n${util.inspect(err)}\`\`\``)
+      // if (process.env.ERROR_WEBHOOK_ID) {
+      //   master.once('CLUSTER_STARTED', () => {
+          // master.rest.on('error', (err) => {
+          //   const embed = new Embed()
+          //     .field('Bot', `${name} (master)`)
+          //     .description(`\`\`\`xl\n${util.inspect(err)}\`\`\``)
     
-            master.rest.webhooks.send(process.env.ERROR_WEBHOOK_ID as Snowflake, process.env.ERROR_WEBHOOK_TOKEN as string, embed)
-          })
-        })
-      }
+          //   master.rest.webhooks.send(process.env.ERROR_WEBHOOK_ID as Snowflake, process.env.ERROR_WEBHOOK_TOKEN as string, embed)
+          // })
+        // })
+      // }
     }
   }
 
@@ -159,17 +159,17 @@ export class Interface {
       })
     }
 
-    if (process.env.ERROR_WEBHOOK_ID) {
-      worker.once('SHARD_READY', () => {
-        worker.api.on('error', (err) => {
-          const embed = new Embed()
-            .field('Bot', `${worker.user?.username} (worker)`)
-            .description(`\`\`\`xl\n${util.inspect(err)}\`\`\``)
+    // if (process.env.ERROR_WEBHOOK_ID) {
+    //   worker.once('SHARD_READY', () => {
+    //     worker.api.on('error', (err) => {
+    //       const embed = new Embed()
+    //         .field('Bot', `${worker.user?.username} (worker)`)
+    //         .description(`\`\`\`xl\n${util.inspect(err)}\`\`\``)
 
-          worker.comms.sendWebhook(process.env.ERROR_WEBHOOK_ID as Snowflake, process.env.ERROR_WEBHOOK_TOKEN as string, embed)
-        })
-      })
-    }
+    //       worker.comms.sendWebhook(process.env.ERROR_WEBHOOK_ID as Snowflake, process.env.ERROR_WEBHOOK_TOKEN as string, embed)
+    //     })
+    //   })
+    // }
   }
 
   addCommands (worker: Worker) {
