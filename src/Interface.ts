@@ -20,7 +20,7 @@ export class Interface {
     return new Database(host, username, password)
   }
 
-  setupSingleton(worker: SingleWorker, name: string) {
+  setupSingleton(worker: SingleWorker, name: string, development = false) {
     this.setupWorker(worker)
 
     let wh: { id: Snowflake, token: string } | null = null
@@ -48,18 +48,22 @@ export class Interface {
       })
     }
 
-    const run = setupInflux(worker.comms, name)
+    if (!development) {
+      const run = setupInflux(worker.comms, name)
 
-    worker.once('READY', () => {
-      run()
-    })
+      worker.once('READY', () => {
+        run()
+      })
+    }
   }
 
-  setupMaster(master: Master, name: string) {
-    const run = setupInflux(master, name)
-    master.on('READY', () => {
-      run()
-    })
+  setupMaster(master: Master, name: string, development = false) {
+    if (!development) {
+      const run = setupInflux(master, name)
+      master.on('READY', () => {
+        run()
+      })
+    }
 
     let wh: { id: Snowflake, token: string } | null = null
 
