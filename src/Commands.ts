@@ -28,15 +28,15 @@ export class Commands {
     })
 
     worker.on('MESSAGE_CREATE', (msg) => {
+      if (!msg.guild_id || !msg.content || msg.author.bot) return
+
       const prefix = this.prefixes.find(x => msg.content.startsWith(x))
       if (!prefix) return
 
       const args = msg.content.slice(prefix.length).toLowerCase().split(' ')
-      const command = args.shift()
+      if (args[0] === '') args.shift()
 
-      if (command?.startsWith(' ')) command.slice(1)
-
-      if (typeof command !== 'string') return
+      const command = args.shift() ?? ''
 
       if (this.oldCommandNames.includes(command)) {
         return worker.api.post(Routes.channelMessages(msg.channel_id), {
