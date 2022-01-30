@@ -10,9 +10,11 @@ import { Embed } from '@jadl/embed'
 import { setupInflux } from './Influx'
 
 import { APIGuild, Routes, Snowflake } from 'discord-api-types/v9'
+import { Commands } from './Commands'
 
 export class Interface {
   api = new Api()
+  commands = new Commands()
 
   createDb(username: string, password: string, host: string = '127.0.0.1') {
     return new Database(host, username, password)
@@ -108,6 +110,8 @@ export class Interface {
   }
 
   setupWorker(worker: Worker) {
+    this.commands.setupWorker(worker)
+
     if (process.env.GUILDS_WEBHOOK_ID) {
       const colors = {
         Joined: 0x109c10,
