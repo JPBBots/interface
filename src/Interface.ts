@@ -16,11 +16,13 @@ export class Interface {
   api = new Api()
   commands = new Commands()
 
+  constructor (public production: boolean = process.env.PRODUCTION === 'true') {}
+
   createDb(username: string, password: string, host: string = '127.0.0.1') {
-    return new Database(host, username, password)
+    return new Database(host, username, password, this.production)
   }
 
-  setupSingleton(worker: SingleWorker, name: string, development = false) {
+  setupSingleton(worker: SingleWorker, name: string) {
     this.setupWorker(worker)
 
     let wh: { id: Snowflake, token: string } | null = null
@@ -48,7 +50,7 @@ export class Interface {
       })
     }
 
-    if (!development) {
+    if (this.production) {
       const run = setupInflux(worker.comms, name)
 
       worker.once('READY', () => {
@@ -57,8 +59,8 @@ export class Interface {
     }
   }
 
-  setupMaster(master: Master, name: string, development = false) {
-    if (!development) {
+  setupMaster(master: Master, name: string) {
+    if (this.production) {
       const run = setupInflux(master, name)
       master.on('READY', () => {
         run()

@@ -13,10 +13,10 @@ export class Database extends EventEmitter<{ started: void }>{
     promise: (any) => any
   }[] = []
 
-  constructor (host: string, public username: string, password: string) {
+  constructor (host: string, public username: string, password: string, production: boolean) {
     super()
 
-    this.mongo = new MongoClient(`mongodb://${username}:${password}@${host}:27017/`, {
+    this.mongo = new MongoClient(`mongodb://${production ? `${username}:${password}@` : ''}${host}:27017/`, {
       useNewUrlParser: true,
       useUnifiedTopology: true
     })
@@ -39,7 +39,7 @@ export class Database extends EventEmitter<{ started: void }>{
     this.emit('started')
   }
 
-  get collection (): (name: string) => Collection {
+  get collection (): <Schema = any>(name: string) => Collection<Schema> {
     if (!this.db) {
       return (name: string) => ({
         findOne: (..._) => {
