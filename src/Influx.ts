@@ -4,7 +4,7 @@ import { FieldType, InfluxDB } from 'influx'
 
 export function setupInflux (thread: Pick<Thread, 'getStats'>, name: string) {
   const influx = new InfluxDB({
-    host: 'localhost',
+    host: 'influxdb',
     database: 'stats',
     schema: [
       {

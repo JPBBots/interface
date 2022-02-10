@@ -16,7 +16,7 @@ export class Database extends EventEmitter<{ started: void }>{
   constructor (host: string, public username: string, password: string, production: boolean) {
     super()
 
-    this.mongo = new MongoClient(`mongodb://${production ? `${username}:${password}@` : ''}${host}:27017/`, {
+    this.mongo = new MongoClient(`mongodb://${production && password ? `${username}:${password}@` : ''}${host}:27017/`, {
       useNewUrlParser: true,
       useUnifiedTopology: true
     })

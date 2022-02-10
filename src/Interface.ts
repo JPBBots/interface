@@ -18,7 +18,7 @@ export class Interface {
 
   constructor (public production: boolean = process.env.PRODUCTION === 'true') {}
 
-  createDb(username: string, password: string, host: string = '127.0.0.1') {
+  createDb(username: string, password: string, host: string = 'mongodb') {
     return new Database(host, username, password, this.production)
   }
 
