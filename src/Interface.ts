@@ -3,7 +3,7 @@ import util from 'util'
 import { Api } from './Api'
 import { Database } from './Database'
 
-import { Master, Worker, SingleWorker, CachedGuild } from 'jadl'
+import { Master, Worker, SingleWorker, CachedGuild, DiscordEventMap } from 'jadl'
 
 import { Embed } from '@jadl/embed'
 
@@ -11,12 +11,13 @@ import { setupInflux } from './Influx'
 
 import { APIGuild, Routes, Snowflake } from 'discord-api-types/v9'
 import { Commands } from './Commands'
+import { EventedGuild } from 'jadl/dist/typings/Discord'
 
 export class Interface {
   api = new Api()
   commands = new Commands()
 
-  constructor (public production: boolean = process.env.PRODUCTION === 'true') {}
+  constructor(public production: boolean = process.env.PRODUCTION === 'true') { }
 
   createDb(username: string, password: string, host: string = 'mongodb') {
     return new Database(host, username, password, this.production)
@@ -125,7 +126,7 @@ export class Interface {
         Unavailable: 0xc4771a,
         Available: 0xe3d512
       }
-      const log = (status: 'Joined' | 'Left' | 'Unavailable' | 'Available', guild: CachedGuild | APIGuild) => {
+      const log = (status: 'Joined' | 'Left' | 'Unavailable' | 'Available', guild: EventedGuild) => {
         worker.api.post(Routes.webhook(process.env.GUILDS_WEBHOOK_ID as Snowflake, process.env.GUILDS_WEBHOOK_TOKEN as string), {
           body: {
             username: worker.user?.username,
@@ -145,13 +146,13 @@ export class Interface {
       worker.on('GUILD_DELETE', (guild) => {
         if (guild.unavailable) return
 
-        log('Left', guild as CachedGuild)
+        log('Left', guild as EventedGuild)
 
         if (unavailable.has(guild.id)) unavailable.delete(guild.id)
       })
       worker.on('GUILD_UNAVAILABLE', (guild) => {
         unavailable.add(guild.id)
-        log('Unavailable', guild as CachedGuild)
+        log('Unavailable', guild as EventedGuild)
       })
       worker.on('GUILD_CREATE', (guild) => {
         if (unavailable.has(guild.id)) {

@@ -4,7 +4,7 @@ import { Worker } from 'jadl'
 
 import util from 'util'
 
-function clean (text): string {
+function clean(text): string {
   if (typeof (text) === 'string') { return text.replace(/`/g, '`' + String.fromCharCode(8203)).replace(/@/g, '@' + String.fromCharCode(8203)) } else { return text }
 }
 
@@ -12,7 +12,7 @@ export class Commands {
   private prefixes = [] as string[]
   private oldCommandNames = [] as string[]
 
-  slashCommandEmbed = new Embed()
+  slashCommandEmbed = new Embed<Promise<APIMessage>>()
     .title('We\'re moving to slash commands!')
     .description(
       'As of now, all commands will be run using the `/` prefix\n\n' +
