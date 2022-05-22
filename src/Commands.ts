@@ -5,7 +5,13 @@ import { Worker } from 'jadl'
 import util from 'util'
 
 function clean(text): string {
-  if (typeof (text) === 'string') { return text.replace(/`/g, '`' + String.fromCharCode(8203)).replace(/@/g, '@' + String.fromCharCode(8203)) } else { return text }
+  if (typeof text === 'string') {
+    return text
+      .replace(/`/g, '`' + String.fromCharCode(8203))
+      .replace(/@/g, '@' + String.fromCharCode(8203))
+  } else {
+    return text
+  }
 }
 
 export class Commands {
@@ -13,12 +19,12 @@ export class Commands {
   private oldCommandNames = [] as string[]
 
   slashCommandEmbed = new Embed<Promise<APIMessage>>()
-    .title('We\'re moving to slash commands!')
+    .title("We're moving to slash commands!")
     .description(
       'As of now, all commands will be run using the `/` prefix\n\n' +
-      '**Slash commands not showing up?** \n' +
-      'Re-inviting the bot with the new link can fix that\n\n' +
-      '[Click here](https://dis.gd/slashcommands) to learn more!'
+        '**Slash commands not showing up?** \n' +
+        'Re-inviting the bot with the new link can fix that\n\n' +
+        '[Click here](https://dis.gd/slashcommands) to learn more!'
     )
     .image('https://img.censor.bot/b2nIhRPu.png')
 
@@ -30,7 +36,7 @@ export class Commands {
     worker.on('MESSAGE_CREATE', (msg) => {
       if (!msg.guild_id || !msg.content || msg.author.bot) return
 
-      const prefix = this.prefixes.find(x => msg.content.startsWith(x))
+      const prefix = this.prefixes.find((x) => msg.content.startsWith(x))
       if (!prefix) return
 
       const args = msg.content.slice(prefix.length).toLowerCase().split(' ')
@@ -41,8 +47,8 @@ export class Commands {
       if (this.oldCommandNames.includes(command)) {
         return worker.api.post(Routes.channelMessages(msg.channel_id), {
           body: {
-            embeds: [this.slashCommandEmbed.render()]
-          }
+            embeds: [this.slashCommandEmbed.render()],
+          },
         })
       }
 
@@ -91,10 +97,8 @@ export class Commands {
 
     worker.api.post(Routes.channelMessages(msg.channel_id), {
       body: {
-        embeds: [
-          embed.render()
-        ]
-      }
+        embeds: [embed.render()],
+      },
     })
   }
 }

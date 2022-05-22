@@ -3,7 +3,13 @@ import util from 'util'
 import { Api } from './Api'
 import { Database } from './Database'
 
-import { Master, Worker, SingleWorker, CachedGuild, DiscordEventMap } from 'jadl'
+import {
+  Master,
+  Worker,
+  SingleWorker,
+  CachedGuild,
+  DiscordEventMap,
+} from 'jadl'
 
 import { Embed } from '@jadl/embed'
 
@@ -17,7 +23,7 @@ export class Interface {
   api = new Api()
   commands = new Commands()
 
-  constructor(public production: boolean = process.env.PRODUCTION === 'true') { }
+  constructor(public production: boolean = process.env.PRODUCTION === 'true') {}
 
   createDb(username: string, password: string, host: string = 'mongodb') {
     return new Database(host, username, password, this.production)
@@ -26,12 +32,12 @@ export class Interface {
   setupSingleton(worker: SingleWorker, name: string) {
     this.setupWorker(worker)
 
-    let wh: { id: Snowflake, token: string } | null = null
+    let wh: { id: Snowflake; token: string } | null = null
 
     if (process.env.STATUS_WEBHOOK_ID) {
       wh = {
         id: process.env.STATUS_WEBHOOK_ID as Snowflake,
-        token: process.env.STATUS_WEBHOOK_TOKEN as string
+        token: process.env.STATUS_WEBHOOK_TOKEN as string,
       }
     }
 
@@ -41,8 +47,8 @@ export class Interface {
         worker.api.post(Routes.webhook(wh.id, wh.token), {
           body: {
             content: msg,
-            username: name
-          }
+            username: name,
+          },
         })
       }
 
@@ -68,12 +74,12 @@ export class Interface {
       })
     }
 
-    let wh: { id: Snowflake, token: string } | null = null
+    let wh: { id: Snowflake; token: string } | null = null
 
     if (process.env.STATUS_WEBHOOK_ID) {
       wh = {
         id: process.env.STATUS_WEBHOOK_ID as Snowflake,
-        token: process.env.STATUS_WEBHOOK_TOKEN as string
+        token: process.env.STATUS_WEBHOOK_TOKEN as string,
       }
     }
 
@@ -83,8 +89,8 @@ export class Interface {
         master.rest.post(Routes.webhook(wh.id, wh.token), {
           body: {
             content: msg,
-            username: name
-          }
+            username: name,
+          },
         })
       }
 
@@ -105,11 +111,17 @@ export class Interface {
               .field('Bot', `${name} (master)`)
               .description(`\`\`\`xl\n${util.inspect(err)}\`\`\``)
 
-            master.rest.post(Routes.webhook(process.env.ERROR_WEBHOOK_ID as Snowflake, process.env.ERROR_WEBHOOK_TOKEN), {
-              body: {
-                embeds: [embed.render()]
+            master.rest.post(
+              Routes.webhook(
+                process.env.ERROR_WEBHOOK_ID as Snowflake,
+                process.env.ERROR_WEBHOOK_TOKEN
+              ),
+              {
+                body: {
+                  embeds: [embed.render()],
+                },
               }
-            })
+            )
           })
         })
       }
@@ -124,21 +136,36 @@ export class Interface {
         Joined: 0x109c10,
         Left: 0xc41f1f,
         Unavailable: 0xc4771a,
-        Available: 0xe3d512
+        Available: 0xe3d512,
       }
-      const log = (status: 'Joined' | 'Left' | 'Unavailable' | 'Available', guild: EventedGuild) => {
-        worker.api.post(Routes.webhook(process.env.GUILDS_WEBHOOK_ID as Snowflake, process.env.GUILDS_WEBHOOK_TOKEN as string), {
-          body: {
-            username: worker.user?.username,
-            embeds: [
-              new Embed()
-                .color(colors[status])
-                .title(`${status} Server`)
-                .description(`${guild.id}${guild.name ? `, ${guild.name}\n${guild.member_count} members` : ''}`)
-                .render()
-            ]
+      const log = (
+        status: 'Joined' | 'Left' | 'Unavailable' | 'Available',
+        guild: EventedGuild
+      ) => {
+        worker.api.post(
+          Routes.webhook(
+            process.env.GUILDS_WEBHOOK_ID as Snowflake,
+            process.env.GUILDS_WEBHOOK_TOKEN as string
+          ),
+          {
+            body: {
+              username: worker.user?.username,
+              embeds: [
+                new Embed()
+                  .color(colors[status])
+                  .title(`${status} Server`)
+                  .description(
+                    `${guild.id}${
+                      guild.name
+                        ? `, ${guild.name}\n${guild.member_count} members`
+                        : ''
+                    }`
+                  )
+                  .render(),
+              ],
+            },
           }
-        })
+        )
       }
 
       const unavailable = new Set()
@@ -172,13 +199,17 @@ export class Interface {
             .field('Bot', `${worker.user?.username} (worker)`)
             .description(`\`\`\`xl\n${util.inspect(err)}\`\`\``)
 
-
-
-          worker.api.post(Routes.webhook(process.env.ERROR_WEBHOOK_ID as Snowflake, process.env.ERROR_WEBHOOK_TOKEN as string), {
-            body: {
-              embeds: [embed.render()]
+          worker.api.post(
+            Routes.webhook(
+              process.env.ERROR_WEBHOOK_ID as Snowflake,
+              process.env.ERROR_WEBHOOK_TOKEN as string
+            ),
+            {
+              body: {
+                embeds: [embed.render()],
+              },
             }
-          })
+          )
         })
       })
     }

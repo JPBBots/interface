@@ -5,15 +5,20 @@ import { Snowflake } from 'discord-api-types/v9'
 export class Api {
   url = 'https://jpbbots.org/api'
 
-  public _request(method: 'GET' | 'POST', url: string, headers?: any, body?: any) {
+  public _request(
+    method: 'GET' | 'POST',
+    url: string,
+    headers?: any,
+    body?: any
+  ) {
     return fetch(`${this.url}${url}`, {
       method,
       headers: {
         'Content-Type': 'application/json',
-        ...(headers ?? {})
+        ...(headers ?? {}),
       },
-      body: body ? JSON.stringify(body) : undefined
-    }).then(x => x.text())
+      body: body ? JSON.stringify(body) : undefined,
+    }).then((x) => x.text())
   }
 
   public async isAdmin(id: Snowflake) {
