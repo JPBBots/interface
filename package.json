@@ -31,7 +31,8 @@
     "influx": "^5.9.2",
     "jadl": "^0.2.1",
     "mongodb": "^3.7.0",
-    "node-fetch": "^2.6.2"
+    "node-fetch": "^2.6.2",
+    "undici": "^5.2.0"
   },
   "devDependencies": {
     "@types/node": "^17.0.34",
