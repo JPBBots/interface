@@ -5,7 +5,7 @@ import { request } from 'undici'
 
 export function setupInflux(thread: Pick<Thread, 'getStats'>, name: string) {
   const influx = new InfluxDB({
-    host: 'influxdb',
+    host: process.env.INFLUX_URL ?? 'influxdb',
     database: 'stats',
     schema: [
       {
