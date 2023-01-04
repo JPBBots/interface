@@ -25,17 +25,14 @@
     "@jadl/cmd": "^0.4.1",
     "@jadl/embed": "^0.0.5",
     "@jpbberry/typed-emitter": "^1.2.1",
-    "@types/mongodb": "^3.6.20",
-    "@types/node-fetch": "^2.5.12",
     "discord-api-types": "^0.33.0",
     "influx": "^5.9.2",
     "jadl": "^0.2.1",
-    "mongodb": "^3.7.0",
-    "node-fetch": "^2.6.2",
+    "mongodb": "^4.13.0",
     "undici": "^5.2.0"
   },
   "devDependencies": {
-    "@types/node": "^17.0.34",
+    "@types/node": "^18.11.18",
     "lerna": "^4.0.0"
   },
   "types": "./dist/index.d.ts"

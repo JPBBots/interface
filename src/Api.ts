@@ -1,4 +1,4 @@
-import fetch from 'node-fetch'
+import { fetch } from 'undici'
 
 import { Snowflake } from 'discord-api-types/v9'
 

@@ -1,4 +1,4 @@
-import { MongoClient, Db, Collection } from 'mongodb'
+import { MongoClient, Db, Collection, Document } from 'mongodb'
 import { EventEmitter } from '@jpbberry/typed-emitter'
 
 export class Database extends EventEmitter<{ started: void }> {
@@ -24,11 +24,7 @@ export class Database extends EventEmitter<{ started: void }> {
     this.mongo = new MongoClient(
       `mongodb://${
         production && password ? `${username}:${password}@` : ''
-      }${host}:27017/`,
-      {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-      }
+      }${host}:27017/`
     )
 
     this.connect()
@@ -51,7 +47,7 @@ export class Database extends EventEmitter<{ started: void }> {
     this.emit('started')
   }
 
-  get collection(): <Schema = any>(name: string) => Collection<Schema> {
+  get collection(): <Schema extends Document = any>(name: string) => Collection<Schema> {
     if (!this.db) {
       return (name: string) =>
         ({
@@ -64,7 +60,7 @@ export class Database extends EventEmitter<{ started: void }> {
               })
             })
           },
-        } as Collection)
+        } as any)
     }
     return this.db?.collection.bind(this.db)
   }
